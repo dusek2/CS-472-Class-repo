@@ -23,17 +23,19 @@ def github_auth(url, lsttoken, ct):
         print(e)
     return jsonData, ct
 
+# get commits for specific @filename
 def get_file_commits(repo, filename, lsttokens):
     commits = []
     ct = 0
     page = 1
+    # loop until done with commit records
     while True:
-        commits_url = f'https://api.github.com/repos/{repo}/commits?path={filename}&page={page}&per_page=100'
+        commits_url = 'https://api.github.com/repos/{repo}/commits?path={filename}&page={page}&per_page=100'
         jsonCommits, ct = github_auth(commits_url, lsttokens, ct)
 
         if not jsonCommits or len(jsonCommits) == 0:
             break
-
+        # separate records
         for commit in jsonCommits:
             author = commit['commit']['author']['name']
             date = commit['commit']['author']['date']
@@ -45,8 +47,8 @@ def get_file_commits(repo, filename, lsttokens):
 
     return commits
 
-
-def authors_file_touches(repo, source_files, lsttokens):
+# get touches
+def file_touches(repo, source_files, lsttokens):
     authors_touches = {}
     for file in source_files:
         print("Reading touches for file: " + file)
@@ -56,28 +58,18 @@ def authors_file_touches(repo, source_files, lsttokens):
 
 # GitHub repo
 repo = 'scottyab/rootbeer'
-# repo = 'Skyscanner/backpack' # This repo is commit heavy. It takes long to finish executing
-# repo = 'k9mail/k-9' # This repo is commit heavy. It takes long to finish executing
-# repo = 'mendhak/gpslogger'
 
 print("Analyzing repo: " + repo)
-
 
 # put your tokens here
 # Remember to empty the list when going to commit to GitHub.
 # Otherwise they will all be reverted and you will have to re-create them
 # I would advise to create more than one token for repos with heavy commits
-lstTokens = ["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",
-             "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",
-                "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",
+lstTokens = ["aaaaaa"
                 ]
 
-# lstTokens = ["aaaaa",
-#                 "bbbb",
-#                 "ccccc"]
 
-
-def read_source_filenames_from_csv(csv_file_path, filename_col_index=0):
+def filenames_from_csv(csv_file_path, filename_col_index=0):
     source_filenames = []
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.reader(file)
@@ -89,13 +81,13 @@ def read_source_filenames_from_csv(csv_file_path, filename_col_index=0):
     return source_filenames
 
 
-fileNameCSV = "data/file_rootbeer.csv"
+CSV = "data/file_rootbeer.csv"
 
-print("Reading source filenames from csv: " + fileNameCSV)
-source_files = read_source_filenames_from_csv(fileNameCSV)
+print("Reading source filenames from csv: " + CSV)
+source_files = filenames_from_csv(CSV)
 
 print("Reading touches from github repo: " + repo)
-file_touches = authors_file_touches(repo, source_files, lstTokens)
+file_touches = file_touches(repo, source_files, lstTokens)
 
 print(colored('Reading done....\n','green'))
 

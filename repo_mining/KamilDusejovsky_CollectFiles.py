@@ -1,11 +1,54 @@
 import json
 import requests
 import csv
+from colorama import Fore, Back, Style
 
 import os
 
+# check if data folder exists
 if not os.path.exists("data"):
  os.makedirs("data")
+
+# programming languages and respective types
+programming_languages = {
+    "Python": [".py", ".pyw", ".pyc", ".pyd", ".pyo", ".py3"],
+    "Java": [".java", ".jar", ".jmod"],
+    "C": [".c"],
+    "C++": [".cpp", ".cxx", ".cc"],
+    "C#": [".cs", ".csx", ".cake"],
+    "JavaScript": [".js", ".mjs", ".cjs"],
+    "TypeScript": [".ts", ".tsx"],
+    "PHP": [".php", ".phtml", ".php3", ".php4", ".php5", ".phps"],
+    "Ruby": [".rb", ".erb"],
+    "Swift": [".swift"],
+    "Kotlin": [".kt", ".kts", ".ktm"],
+    "Go": [".go"],
+    "Rust": [".rs", ".rlib"],
+    "Perl": [".pl", ".pm", ".t", ".pod"],
+    "Scala": [".scala", ".sc"],
+    "Lua": [".lua"],
+    "Haskell": [".hs", ".lhs"],
+    "Objective-C": [".m", ".mm"],
+    "Dart": [".dart"],
+    "Groovy": [".groovy", ".gvy", ".gy", ".gsh"],
+    "Shell": [".sh", ".bash", ".zsh"],
+    "SQL": [".sql"],
+    "HTML": [".html", ".htm"],
+    "CSS": [".css"],
+    "XML": [".xml"],
+    "JSON": [".json"],
+    "YAML": [".yaml", ".yml"],
+    "Markdown": [".md", ".markdown"]
+}
+
+# Check if file is source file
+def is_source_file(filename, languages):
+    file_extension = os.path.splitext(filename)[1]
+    print(file_extension)
+    for lang in languages:
+        if file_extension in programming_languages.get(lang, []):
+            return True
+    return False
 
 # GitHub Authentication function
 def github_auth(url, lsttoken, ct):
@@ -21,10 +64,34 @@ def github_auth(url, lsttoken, ct):
         print(e)
     return jsonData, ct
 
+# @repo, Github repo
+# @lstTokens, GitHub authentication tokens
+def get_repo_languages(repo, lsttokens):
+    languages_url = 'https://api.github.com/repos/{repo}/languages'
+    languages_data, _ = github_auth(languages_url, lsttokens, 0)
+    print(languages_data)
+    return list(languages_data.keys()) if languages_data else []
+
 # @dictFiles, empty dictionary of files
 # @lstTokens, GitHub authentication tokens
 # @repo, GitHub repo
 def countfiles(dictfiles, lsttokens, repo):
+    
+    # get languages in repo
+    languages = get_repo_languages(repo, lsttokens)
+    print("Languages in repo:")
+    
+    print(Fore.RED)
+    print(languages)
+    print(Style.RESET_ALL)
+    
+    print(Fore.GREEN + "Source files green: ")
+    print(Style.RESET_ALL)
+
+    if not languages:
+        print("No languages found for the repository.")
+        return
+    
     ipage = 1  # url page counter
     ct = 0  # token counter
 
@@ -34,10 +101,10 @@ def countfiles(dictfiles, lsttokens, repo):
             spage = str(ipage)
             commitsUrl = 'https://api.github.com/repos/' + repo + '/commits?page=' + spage + '&per_page=100'
             jsonCommits, ct = github_auth(commitsUrl, lsttokens, ct)
-
             # break out of the while loop if there are no more commits in the pages
             if len(jsonCommits) == 0:
                 break
+
             # iterate through the list of commits in  spage
             for shaObject in jsonCommits:
                 sha = shaObject['sha']
@@ -45,32 +112,34 @@ def countfiles(dictfiles, lsttokens, repo):
                 shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
                 shaDetails, ct = github_auth(shaUrl, lsttokens, ct)
                 filesjson = shaDetails['files']
+
                 for filenameObj in filesjson:
+
                     filename = filenameObj['filename']
-                    dictfiles[filename] = dictfiles.get(filename, 0) + 1
                     print(filename)
+
+                    if is_source_file(filename, languages):
+                        dictfiles[filename] = dictfiles.get(filename, 0) + 1
+                        print(Fore.GREEN + filename)
+                        print(Style.RESET_ALL)
+
+
             ipage += 1
-    except:
-        print("Error receiving data")
+    except Exception as e:
+        print(f"Exception: {e}")
         exit(0)
+
+
 # GitHub repo
 repo = 'scottyab/rootbeer'
-# repo = 'Skyscanner/backpack' # This repo is commit heavy. It takes long to finish executing
-# repo = 'k9mail/k-9' # This repo is commit heavy. It takes long to finish executing
-# repo = 'mendhak/gpslogger'
 
 
 # put your tokens here
 # Remember to empty the list when going to commit to GitHub.
 # Otherwise they will all be reverted and you will have to re-create them
 # I would advise to create more than one token for repos with heavy commits
-lstTokens = ["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",
-                "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",
-                "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"]
-
-# lstTokens = ["aaaaa",
-#                 "bbbb",
-#                 "ccccc"]
+lstTokens = [   "aaaaaaa"
+                ]
 
 dictfiles = dict()
 countfiles(dictfiles, lstTokens, repo)
@@ -93,4 +162,6 @@ for filename, count in dictfiles.items():
         bigcount = count
         bigfilename = filename
 fileCSV.close()
+
+print(Fore.BLUE)
 print('The file ' + bigfilename + ' has been touched ' + str(bigcount) + ' times.')
