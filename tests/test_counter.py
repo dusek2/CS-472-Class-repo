@@ -69,3 +69,18 @@ class CounterTest(TestCase):
         # try non existing counter
         result = client.get('/counters/noNameCounter')
         self.assertEqual(result.status_code, status.HTTP_404_NOT_FOUND)
+        
+
+    def test_delete_a_counter(self):
+        """It should delete an existing counter"""
+        # Create a counter
+        result = client.post('/counters/fooDelete')
+        self.assertEqual(result.status_code, status.HTTP_201_CREATED)
+        
+        # try delete counter
+        result = client.delete('/counters/fooDelete')
+        self.assertEqual(result.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # try finding the counter
+        result = client.get('/counters/fooDelete')
+        self.assertEqual(result.status_code, status.HTTP_404_NOT_FOUND)
