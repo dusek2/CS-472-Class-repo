@@ -45,6 +45,6 @@ def read_counter(name):
 def delete_counter(name):
     app.logger.info(f"Request to delete counter: {name}")
     if name not in COUNTERS:
-        return {"Message": f"Counter does not exist"}, status.HTTP_404_NOT_FOUND
+        return {"Message": "Counter does not exist"}, status.HTTP_404_NOT_FOUND
     del COUNTERS[name]
     return '', status.HTTP_204_NO_CONTENT
