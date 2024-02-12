@@ -20,6 +20,7 @@ def create_counter(name):
     COUNTERS[name] = 0
     return {name: COUNTERS[name]}, status.HTTP_201_CREATED
 
+
 # PUT method to update the counter
 @app.route('/counters/<name>', methods=['PUT'])
 def update_counter(name):
@@ -29,6 +30,7 @@ def update_counter(name):
     COUNTERS[name] += 1
     return {name: COUNTERS[name]}, status.HTTP_200_OK
 
+
 # GET method to read the counter
 @app.route('/counters/<name>', methods=['GET'])
 def read_counter(name):
@@ -36,6 +38,7 @@ def read_counter(name):
     if name not in COUNTERS:
         return {"Message": f"Counter {name} doesnt exists"}, status.HTTP_404_NOT_FOUND
     return {name: COUNTERS[name]}, status.HTTP_200_OK
+
 
 # DELETE method to delete the counter
 @app.route('/counters/<name>', methods=['DELETE'])
