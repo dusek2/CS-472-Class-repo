@@ -22,13 +22,16 @@ from src import status
 
 client = app.test_client()
 
+
 class CounterTest(TestCase):
     """Counter tests"""
+
 
     def test_create_a_counter(self):
         """It should create a counter"""
         result = client.post('/counters/foo')
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
+
 
     def test_duplicate_a_counter(self):
         """It should return an error for duplicates"""
@@ -36,6 +39,7 @@ class CounterTest(TestCase):
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
         result = client.post('/counters/bar')
         self.assertEqual(result.status_code, status.HTTP_409_CONFLICT)
+
 
     def test_update_a_counter(self):
         """It should update an existing counter"""
@@ -76,11 +80,9 @@ class CounterTest(TestCase):
         # Create a counter
         result = client.post('/counters/fooDelete')
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
-        
         # try delete counter
         result = client.delete('/counters/fooDelete')
         self.assertEqual(result.status_code, status.HTTP_204_NO_CONTENT)
-        
         # try finding the counter
         result = client.get('/counters/fooDelete')
         self.assertEqual(result.status_code, status.HTTP_404_NOT_FOUND)
