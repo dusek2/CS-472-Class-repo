@@ -27,6 +27,7 @@ jobs:
                     nosetests -v --with-spec --spec-color --with-coverage --cover-package=app
             - name: Security analysis with Bandit
               run: |
+                    pip install bandit
                     bandit -r src
             - name: Generate documentation with Sphinx
               run: |
