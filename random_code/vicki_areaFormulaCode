@@ -1,0 +1,38 @@
+#Using the area formula, area = length * width
+
+#Original Code
+
+while True:
+  length = int(input("Enter the length value: "))
+  if length > 0:
+    break
+while True:
+  width = int(input("Enter the width: "))
+  if width > 0:
+    break
+print("The Area is", length * width)
+
+# Refactored Code
+def get_positive_integer(prompt):
+    """
+    Prompts the user to enter a positive integer value.
+    
+    Args:
+        prompt (str): The message to display to the user.
+    
+    Returns:
+        int: A positive integer value entered by the user.
+    """
+    while True:
+        value = int(input(prompt))
+        if value > 0:
+            return value
+
+# Prompt the user to enter the length and width
+length = get_positive_integer("Enter the length value: ")
+width = get_positive_integer("Enter the width: ")
+
+# Calculate and print the area
+area = length * width
+print("The Area is", area)
+
