@@ -25,4 +25,17 @@ jobs:
             - name: Testing coverage with Nodetests
               run: |
                     nosetests -v --with-spec --spec-color --with-coverage --cover-package=app
+            - name: Security analysis with Bandit
+              run: |
+                    bandit -r src
+            - name: Generate documentation with Sphinx
+              run: |
+                    sphinx-apidoc -o docs/source src
+                    sphinx-build -b html docs/source docs/build
+            - name: Deploy documentation
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: ./docs/build
+                  
                     
