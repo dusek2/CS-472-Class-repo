@@ -31,6 +31,7 @@ jobs:
                     bandit -r src
             - name: Generate documentation with Sphinx
               run: |
+                    pip install sphinx
                     sphinx-apidoc -o docs/source src
                     sphinx-build -b html docs/source docs/build
             - name: Deploy documentation
