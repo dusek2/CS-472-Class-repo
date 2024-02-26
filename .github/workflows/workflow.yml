@@ -20,6 +20,7 @@ jobs:
                     pip install -r requirements.txt
             - name: Install git
               run: |
+                    apt-get update
                     apt-get install git -y
             - name: Linting with Flake8
               run: |
