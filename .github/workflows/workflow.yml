@@ -19,7 +19,8 @@ jobs:
                     python -m pip install --upgrade pip
                     pip install -r requirements.txt
             - name: Install git
-              run: sudo apt-get update && sudo apt-get install git -y
+              run: |
+                    apt-get install git -y
             - name: Linting with Flake8
               run: |
                     flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics
