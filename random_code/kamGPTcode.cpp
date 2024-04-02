@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <string>
+#include <stack>
 
 void searchSubstrings(std::unordered_map<std::string, int> &foundSubstrings, std::unordered_map<std::string, int> wordList,
                       std::string &targetString, int startPosition, int wordLength, std::string currentSubstring);
@@ -57,56 +58,64 @@ int main()
 }
 
 /**
-* @brief Recursively searches for substrings composed of words from a word list.
-*
-* Recursively searches for substrings within a target string that are composed of
-* words from a given word list. Counts the occurrences of each found substring.
-*
-* @param substringCounts An unordered_map (passed by reference) to store the counts of
-*        found substrings. Keys are the substrings, values are their counts.
-* @param wordList An unordered_map containing the words to search for. It is copied
-*        to prevent modification of the original list.
-* @param targetString The string to search within.
-* @param index The starting index for the current search iteration.
-* @param wordLength The length of the words in the word list.
-* @param currentSubstring The substring accumulated so far in the recursive process.
-*
-* @note This function modifies the `substringCounts` map to store substring counts.
-* @note Assumes all words in the `wordList` have the same length (`wordLength`).
-* @note Assumes the `targetString` contains sufficient characters for potential substrings.
-*/
-void searchSubstrings(std::unordered_map<std::string, int> &substringCounts, std::unordered_map<std::string, int> wordList,
-                      std::string &targetString, int index, int wordLength, std::string currentSubstring)
+ * @brief Iteratively searches for substrings composed of words from a word list.
+ *
+ * Iteratively searches for substrings within a target string that are composed of
+ * words from a given word list. Counts the occurrences of each found substring.
+ *
+ * @param substringCounts An unordered_map (passed by reference) to store the counts of
+ *        found substrings. Keys are the substrings, values are their counts.
+ * @param wordList An unordered_map containing the words to search for.
+ * @param targetString The string to search within.
+ * @param wordLength The length of the words in the word list.
+ *
+ * @note This function modifies the `substringCounts` map to store substring counts.
+ * @note Assumes all words in the `wordList` have the same length (`wordLength`).
+ * @note Assumes the `targetString` contains sufficient characters for potential substrings.
+ */
+void searchSubstrings(std::unordered_map<std::string, int> &substringCounts,
+                      std::unordered_map<std::string, int> &wordList,
+                      std::string &targetString, int wordLength)
 {
-    std::string foundWord = targetString.substr(index, wordLength);
-    wordList.erase(foundWord);
-    // Update the index
-    index += wordLength;
-    // Update the current substring
-    if (wordList.empty())
+    // Stack to store the search state
+    std::stack<std::pair<int, std::string>> searchStack;
+    // Start with an empty substring at index 0
+    searchStack.push({0, ""});
+    // iterate until no more substrings can be found
+    while (!searchStack.empty())
     {
-        substringCounts[currentSubstring]++;
-        return;
-    }
-    // Find the next word
-    std::string nextWord = targetString.substr(index, wordLength);
-    for (auto listIter = wordList.begin(); listIter != wordList.end(); ++listIter)
-    {
-        if (nextWord == listIter->first)
-            searchSubstrings(substringCounts, wordList, targetString, index, wordLength, currentSubstring + nextWord);
+        auto [index, currentSubstring] = searchStack.top();
+        searchStack.pop();
+        // Check if all words found (base case)
+        if (wordList.empty())
+        {
+            substringCounts[currentSubstring]++;
+            continue;
+        }
+        // Get the next word
+        std::string nextWord = targetString.substr(index, wordLength);
+        // Iterate through remaining words and push on stack
+        for (auto &wordEntry : wordList)
+        {
+            if (wordEntry.first == nextWord)
+            {
+                searchStack.push({index + wordLength, currentSubstring + nextWord});
+                break;
+            }
+        }
     }
 }
 
 /**
  * @brief Prints substrings and their counts from a map.
- * 
+ *
  * Iterates over an unordered_map, `substringCounts`, printing each key-value pair where the key is a substring
  * and the value is its occurrence count. Output format is "<substring> - Count: <count>". The iteration order
  * is based on the map's internal hash table, hence unordered.
- * 
+ *
  * @param substringCounts An unordered_map with std::string keys (substrings) and int values (counts). Assumes
  *        the map is non-empty; an empty map results in no output.
- * 
+ *
  * @note This function produces output to std::cout and modifies no inputs.
  */
 void displaySubstrings(const std::unordered_map<std::string, int> &substringCounts)

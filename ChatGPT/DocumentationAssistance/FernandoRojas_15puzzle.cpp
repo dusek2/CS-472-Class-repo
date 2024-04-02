@@ -46,47 +46,44 @@ int main(){
     openSet.push_back(start);
     make_heap(openSet.begin(), openSet.end(), compare());
 
-    //A* algorithm
-    while(!openSet.empty()){
-    
-        //sort_heap was not working here, need to debug
-        make_heap(openSet.begin(), openSet.end(), compare());
+    // A* algorithm
+    while (!openSet.empty()) {
 
-        //Get min value from heap
+        // Get the node with the minimum fScore from the heap
         Node current = openSet[0];
 
-        //End loop if goal state found
-        if (isgoalstate(current.matrix)){
+        // End loop if goal state found
+        if (isgoalstate(current.matrix)) {
             break;
         }
 
-        //Move open node to closed node
-        pop_heap(openSet.begin(), openSet.end());
+        // Move open node to closed node
+        std::pop_heap(openSet.begin(), openSet.end());
         openSet.pop_back();
         closedSet.push_back(current);
-        int parentIndex = closedSet.size()-1;
+        int parentIndex = closedSet.size() - 1;
 
-    // Usage of the applyOperator function
+        // Apply operators to generate successor nodes
 
-    // UP operator
-    if (current.blankRow > 0) {
-        applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.UP(); });
-    }
+        // UP operator
+        if (current.blankRow > 0) {
+            applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.UP(); });
+        }
 
-    // DOWN operator
-    if (current.blankRow < 3) {
-        applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.DOWN(); });
-    }
+        // DOWN operator
+        if (current.blankRow < 3) {
+            applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.DOWN(); });
+        }
 
-    // LEFT operator
-    if (current.blankColumn != 0) {
-        applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.LEFT(); });
-    }
+        // LEFT operator
+        if (current.blankColumn != 0) {
+            applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.LEFT(); });
+        }
 
-    // RIGHT operator
-    if (current.blankColumn != 3) {
-        applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.RIGHT(); });
-    }
+        // RIGHT operator
+        if (current.blankColumn != 3) {
+            applyOperator(current, parentIndex, openSet, closedSet, [](Node& node) { node.RIGHT(); });
+        }
 
     }
     
